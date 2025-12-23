@@ -4,9 +4,6 @@ from .models import Employee
 from .serializers import EmployeeSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from django.http import Http404
-
-
 
 # Create your views here.
 
@@ -27,18 +24,25 @@ class Employees(APIView):
     # single emplyee record 
 
 class EmployeeDetail(APIView):
+    # def get_object(self, pk):
+    #     return get_object_or_404(Employee, pk=pk)
 
-    def get_object(self, pk):
-        return get_object_or_404(Employee, pk=pk)
+    # def get(self,request, pk):
+    #     employee = self.get_object(pk)
+    #     serializer = EmployeeSerializer(employee)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def get(self,request, pk):
-        employee = self.get_object(pk)
+    def get(self,request,pk):
+        try:
+            employee = Employee.objects.get(pk=pk)
+        except Employee.DoesNotExist:
+             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = EmployeeSerializer(employee)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # put method
     def put(self,request,pk):
-        employee = self.get_object(pk)
+        employee = Employee.objects.get(pk=pk)
         serializer = EmployeeSerializer(employee, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -46,7 +50,7 @@ class EmployeeDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # delete method
     def delete(self,request,pk):
-        employee = self.get_object(pk)
+        employee = Employee.objects.get(pk=pk)
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

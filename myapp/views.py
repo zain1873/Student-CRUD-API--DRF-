@@ -35,6 +35,7 @@ def StudentDetailView(request, pk):
         serializer = StudentSerializer(student)
         return Response(serializer.data, status.HTTP_200_OK)
 
+    # update 
     elif request.method == 'PUT':
         serializer = StudentSerializer(student,data=request.data)
         if serializer.is_valid():

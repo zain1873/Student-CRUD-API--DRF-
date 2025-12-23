@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from .models import Employee
 from .serializers import EmployeeSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+
 
 
 # Create your views here.
@@ -26,12 +27,9 @@ class Employees(APIView):
     # single emplyee record 
 
 class EmployeeDetail(APIView):
+
     def get_object(self, pk):
-        try:
-            employee = Employee.objects.get(pk=pk)
-            return(employee)
-        except Employee.DoesNotExist:
-            raise Http404
+        return get_object_or_404(Employee, pk=pk)
 
     def get(self,request, pk):
         employee = self.get_object(pk)
@@ -46,10 +44,10 @@ class EmployeeDetail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     # delete method
     def delete(self,request,pk):
         employee = self.get_object(pk)
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 

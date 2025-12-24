@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products Home</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-card h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .product-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .price {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+        }
+        .error {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Products</h1>
+    </header>
+
+    <div class="container" id="products-container">
+        <div class="loading">Loading products...</div>
+    </div>
+
+    <script>
+        const container = document.getElementById('products-container');
+
+        // Correct DRF API endpoint
+        const apiUrl = "http://127.0.0.1:8000/products/";
+
+        fetch(apiUrl)
+            .then(res => {
+                const contentType = res.headers.get("content-type");
+                if(contentType && contentType.includes("application/json")){
+                    return res.json();
+                } else {
+                    return res.text().then(text => { 
+                        throw new Error("Expected JSON but got HTML:\n" + text); 
+                    });
+                }
+            })
+            .then(data => {
+                container.innerHTML = '';
+                if(!Array.isArray(data) || data.length === 0){
+                    container.innerHTML = '<p>No products found.</p>';
+                    return;
+                }
+                data.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <h3>${product.product_name}</h3>
+                        <p class="price">Price: $${product.price}</p>
+                        <p>${product.description}</p>
+                    `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => {
+                container.innerHTML = `<div class="error">Error fetching products: ${error.message}</div>`;
+                console.error(error);
+            });
+    </script>
+</body>
+</html>

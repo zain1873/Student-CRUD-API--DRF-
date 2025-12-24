@@ -5,6 +5,10 @@ from .models import Product
 from rest_framework.response import Response
 from rest_framework import status
 
+
+def home(request):
+    return render(request, "home.html")
+
 # Create your views here.
 
 # viewsets
@@ -41,5 +45,7 @@ class ProductViewSets(viewsets.ViewSet):
         product = Product.objects.get(pk=pk)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 

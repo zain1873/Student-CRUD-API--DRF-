@@ -1,21 +1,24 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from .models import Employee
 from .serializers import EmployeeSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .paginations import CustomPagination
+from .filters import EmployeeFilter
+from rest_framework.filters import SearchFilter
 
 # Create your views here.
 
-class Employees(APIView):
-    def get(self, request):
-        employees = Employee.objects.all()
-        paginator = CustomPagination()             # ← pagination instance
-        result_page = paginator.paginate_queryset(employees, request)  # ← paginate queryset
-        serializer = EmployeeSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)  
-    
+class Employees(ListAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    pagination_class = CustomPagination
+    filter_backends = [SearchFilter]
+    filterset_class = EmployeeFilter
+    search_fields = ['emp_name']
+
     # post
     def post(self, request):
         serializer = EmployeeSerializer(data=request.data)

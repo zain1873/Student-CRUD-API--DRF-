@@ -1,9 +1,26 @@
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Blog, Comment
 from .serializers import BlogSerializer, CommentSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+# Frontend page
+def index(request):
+    return render(request, 'blog/index.html')
+
+# Simple GET/POST example
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def post_list(request):
+    if request.method == 'GET':
+        return Response({"message": "public can view this data"})
+    elif request.method == 'POST':
+        return Response({"message": f"data is created by {request.user.username}"})
+
 
 # Blogs list + create
 class BlogsView(APIView):

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog Frontend</title>
+</head>
+<body>
+    <h1>JWT Blog Demo</h1>
+
+    <!-- Login -->
+    <div>
+        <h3>Login</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <p id="token" style="word-break: break-all;"></p>
+
+    <!-- Post creation -->
+    <div>
+        <h3>Create Post</h3>
+        <button onclick="createPost()">Create Post</button>
+    </div>
+
+    <!-- Show GET response -->
+    <div>
+        <h3>View Posts</h3>
+        <button onclick="viewPosts()">GET Posts</button>
+        <pre id="get_response"></pre>
+    </div>
+
+<script>
+let accessToken = "";
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    fetch('/api/token/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.access) {
+            accessToken = data.access;
+            // Store token in localStorage or sessionStorage
+            localStorage.setItem('accessToken', accessToken);
+
+            alert("Login successful!");
+
+            // Redirect to blogs page
+            window.location.href = '/blogs/';
+        } else {
+            alert("Login failed. Check username/password.");
+        }
+    });
+}
+</script>
+
+</body>
+</html>
